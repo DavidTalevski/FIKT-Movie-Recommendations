@@ -81,6 +81,13 @@ def view_movies_one_by_one(movies, genres, cast):
             print("Movie added to excluded list.")
 
 
+def print_user_information(user):
+    print("\nUser's Entered Information:")
+    print(f"Selected Years: {', '.join(map(str, user.selected_years))}")
+    print(f"Favorite Genres: {', '.join(user.favorite_genres)}")
+    print(f"Favorite Actors: {', '.join(user.favorite_actors)}")
+    print(f"Watched Movies: {', '.join(user.excluded_titles)}")
+
 if __name__ == "__main__":
     db = MovieDatabase()
     db.load_data()
@@ -97,6 +104,8 @@ if __name__ == "__main__":
     user.selected_years = ask_user_for_years()
     user.favorite_genres = ask_user_for_genres()
     user.favorite_actors = ask_user_for_favorite_actors()
+
+    print_user_information(user)
 
     filtered_movies = db.filter_movies(user.selected_years, user.favorite_genres, user.favorite_actors, user.excluded_titles)
     
