@@ -31,7 +31,7 @@ class MovieDatabase:
     def get_movies_by_decade(self, decade):
         return self.data.get(decade, [])
 
-    def filter_movies(self, years, genres, cast):
+    def filter_movies(self, years, genres, cast, excluded_titles=[]):
         merged_movies = []
 
         for year in years:
@@ -41,7 +41,7 @@ class MovieDatabase:
         print(f"Found {len(merged_movies)} movies with the year criteria")
 
         # Reverse in order for the latest movies to have a higher priority
-        merged_movies.reverse();
+        merged_movies.reverse()
 
         filtered_movies = []
 
@@ -63,6 +63,11 @@ class MovieDatabase:
 
         print(f"Reduced down to {len(cast_filtered)} movies after applying cast filter")
 
+        # Filter movies by excluded titles
+        final_filtered_movies = [movie for movie in cast_filtered if movie['title'] not in excluded_titles]
+
+        print(f"Excluded {len(cast_filtered) - len(final_filtered_movies)} movies based on excluded titles")
+
         # Sort movies by amount of genres
-        return sorted(cast_filtered, key=lambda x: x['count'], reverse=True)
+        return sorted(final_filtered_movies, key=lambda x: x['count'], reverse=True)
 

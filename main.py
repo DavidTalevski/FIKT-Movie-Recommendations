@@ -2,6 +2,7 @@ from src.movieDatabases import MovieDatabase
 import inquirer
 from src.user import User
 from colorama import Fore, init
+import json
 
 # Initialize colorama
 init(autoreset=True)
@@ -26,7 +27,7 @@ def ask_user_for_years():
 
     year_question = inquirer.Checkbox(
         "selected_years",
-        message="Select the years you're interested in for movies:",
+        message="Select the years you're interested in for movies",
         choices=year_choices,
     )
 
@@ -69,10 +70,16 @@ def view_movies_one_by_one(movies, genres, cast):
         
         print("-------------------------------\n")
         
-        user_input = input("Press Enter to view the next movie or 'q' to quit: ")
-        
+        user_input = input("Press Enter to view the next movie, 'q' to quit, or 'Y' if you've already seen this movie: ")
+
         if user_input.lower() == 'q':
+            with open('database/excluded-movies.json', 'w') as json_file:
+                json.dump(user.excluded_titles, json_file)
             break
+        elif user_input.lower() == 'y':
+            user.excluded_titles.append(movie["title"])
+            print("Movie added to excluded list.")
+
 
 if __name__ == "__main__":
     db = MovieDatabase()
@@ -80,11 +87,18 @@ if __name__ == "__main__":
 
     user = User()
 
+    # Load excluded titles from the JSON file
+    try:
+        with open('database/excluded-movies.json', 'r') as json_file:
+            user.excluded_titles = json.load(json_file)
+    except FileNotFoundError:
+        user.excluded_titles = []
+
     user.selected_years = ask_user_for_years()
     user.favorite_genres = ask_user_for_genres()
     user.favorite_actors = ask_user_for_favorite_actors()
 
-    filtered_movies = db.filter_movies(user.selected_years, user.favorite_genres, user.favorite_actors)
+    filtered_movies = db.filter_movies(user.selected_years, user.favorite_genres, user.favorite_actors, user.excluded_titles)
     
     if not filtered_movies:
         print("No movies match your criteria.")

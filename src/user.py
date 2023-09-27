@@ -3,3 +3,4 @@ class User:
         self.favorite_actors = []
         self.favorite_genres = []
         self.selected_years = []
+        self.excluded_titles = []
